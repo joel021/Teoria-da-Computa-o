@@ -1,0 +1,6 @@
+i,qtd_E,E,alphabet,alphabet_stack,n,afd_graph,init_state,final_states
+0,2,0 1,0 1,A,,0 0 * 0 A;0 1 A 1 *;1 1 A 1 *;1 1 * 1 *,0,1
+1,2,i j,0 1,A,,i 0 * i A;i 0 * i AA;i * * j *;j 1 A j *,i,j
+3,1,0,0 1,U Z,,0 0 * 0 Z;0 0 U 0 *;0 1 * 0 *;0 1 Z 0 *,0,0
+4,3,0 1 F,0 1 2,X,,0 0 * 0 X;0 1 X 1 *;0 2 * F *;F * X F *;1 1 X 1 *;1 2 * F *,0,F
+5,3,0 1 2,0 1 2,A,,0 0 * 0 A;0 * * 1 *;1 1 * 1 *;1 * * 2 *;2 2 A 2 *,0,2
