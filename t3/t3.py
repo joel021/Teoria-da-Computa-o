@@ -114,8 +114,5 @@ class AFNDP():
         self.final_states = definition["final_states"].split(" ")
 
 
-#afndp = AFNDP()
-#afndp.auto_run()
-
-with open("words.txt", "w") as f:
-    f.write("mada")
+afndp = AFNDP()
+afndp.auto_run()
