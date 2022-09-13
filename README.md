@@ -1,2 +1,2 @@
-# LFA-
- Linguagens Formais e Automatos - GCET518
+# Teoria da Computação-
+
