@@ -4,6 +4,7 @@ import time
 import glob
 from tm import TM
 from threading import Thread
+import matplotlib.pyplot as plt
 
 def d_from_file(file):
     """Definition from file"""
@@ -54,7 +55,6 @@ def generate_words(x,y, qtd=10_000, step=100):
         x_k = x*int(k/2)
         y_k = y*int(k/2)
         words.append(x_k+y_k)
-        words.append(y_k+x_k)
     return words
 
 def case_test(path, name, x, y, qtd, step, time_off):
@@ -65,4 +65,31 @@ def case_test(path, name, x, y, qtd, step, time_off):
 
     ## Generate too many words
     words = generate_words(x=x,y=y, qtd = qtd, step = step)
-    pd.DataFrame(delta_time(mt_instance, words, name, time_off)).to_csv(path+"/test_cases/"+name+".csv", index=False)
+    pd.DataFrame(delta_time(mt_instance, words, name, time_off)).to_csv(path+"/"+name+".csv", index=False)
+
+
+def plot(x_arr, y_arr, title, w=10, h=10):
+    fig, ax = plt.subplots(figsize=(w, h))
+    
+    ax.axvline(x=0, color='red')
+    ax.axhline(y=0, color='yellow')
+
+    ax.plot(x_arr, y_arr, 'b-', label='y')
+
+    ax.set(xlabel='|w|->', ylabel='deltaT(|w|) (s)->', title=title)
+    ax.grid()
+    ax.legend()
+    plt.show()
+
+def plot_compare(x_arr, y_arr, x_pred, y_pred, popt, mse_error, title):
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.axvline(x=0, color='red')
+    ax.axhline(y=0, color='yellow')
+    
+    ax.plot(x_pred, y_pred, 'r-', label="fit: a = "+str(popt[0])+", b = "+str(popt[1])+", c = "+str(popt[2])+", erro mse = "+str(mse_error))
+    ax.plot(x_arr, y_arr, 'b-', label='y')
+
+    ax.set(xlabel='|w|->', ylabel='deltaT(|w|) (s)->', title=title)
+    ax.grid()
+    ax.legend()
+    plt.show()
