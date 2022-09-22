@@ -3,6 +3,7 @@ import numpy as np
 import time
 import glob
 from tm import TM
+from threading import Thread
 
 def d_from_file(file):
     """Definition from file"""
@@ -21,35 +22,47 @@ def get_definitions(path):
 
     return definitions
 
-def delta_time(ext_delta, words, name):
+def process_word(turing_reference, word, result):
+    result['t0'] = time.time()
+    turing_reference.extended_delta(word)
+    result['t1'] = time.time()
+
+def delta_time(mt_instance, words, name, time_off):
     time_df = []
     for w in words:
-        t0 = time.time()
-        ext_delta(w)
-        t1 = time.time()
 
-        time_df.append({"deltaT": t1-t0,
-                        "len_w": len(w),
-                        "name": name})
+        result = dict({"t0": time.time(),
+                        "t1": None})
+
+        t = Thread(target=process_word, args=(mt_instance, w, result))
+        t.start()
+
+        while (result['t1'] == None and (time.time() - result["t0"]) < time_off): #wait, on the main thread, if the result changes. If not change and time out of the time_off, stop this thread
+            time.sleep(0.1) #sleep for 0.1 seconds
+
+        if result['t1'] != None: #compute only the occurrences that MT not loop
+            time_df.append({"deltaT": result['t1']-result['t0'],
+                            "len_w": len(w),
+                            "name": name})
 
     return time_df
 
-def generate_words(x,y):
+def generate_words(x,y, qtd=10_000, step=100):
     words = []
 
-    for k in np.arange(0, 10_000, 100):
+    for k in np.arange(0, qtd, step):
         x_k = x*int(k/2)
         y_k = y*int(k/2)
         words.append(x_k+y_k)
         words.append(y_k+x_k)
     return words
 
-def case_test(path, name, x, y):
+def case_test(path, name, x, y, qtd, step, time_off):
     mt_def = d_from_file(path+"/"+name+".tm")
 
     mt_instance = TM()
     mt_instance.setup(mt_def)
 
     ## Generate too many words
-    words = generate_words(x=x,y=y)
-    pd.DataFrame(delta_time(mt_instance.extended_delta, words, name)).to_csv(path+"/test_cases/"+name+".csv", index=False)
+    words = generate_words(x=x,y=y, qtd = qtd, step = step)
+    pd.DataFrame(delta_time(mt_instance, words, name, time_off)).to_csv(path+"/test_cases/"+name+".csv", index=False)
