@@ -1,4 +1,4 @@
-class MT(): #Turing Machine
+class TM(): #Turing Machine
 
     def __init__(self):
         pass
@@ -47,12 +47,8 @@ class MT(): #Turing Machine
         for e in E: #initialize the graph
             for c in alphabet: 
                 mt_graph[(e, c)] = []
-                mt_graph[(e, c)] = []
-                mt_graph[(e, c)] = []
 
             for c in tape_alphabet: 
-                mt_graph[(e, c)] = []
-                mt_graph[(e, c)] = []
                 mt_graph[(e, c)] = []
 
         for it in iteractions: #to each n iteration, receive <a, b, c, d, e>:
@@ -75,23 +71,38 @@ class MT(): #Turing Machine
 
         return i
 
+    def get(self, tape, i, default):
+        """ Return a value, if i is in range of index. Return default if not.
+        @l: (List)
+        @i: (int) Position
+        @default: (Object) Default value, can be string, int, float etc.
+        """
+        len_l = len(tape)
+
+        if len_l <= i:
+            #complete the tape
+            for j in range(i-len_l+1):
+                tape.append(default)
+        
+        return tape[i]
+            
     def extended_delta(self, tape):
+        tape = list(tape) #make sure the tape is a list
 
         if not self.l_limiter in tape: #Make sure the tape is with correct shape
             tape = [self.l_limiter] + tape
-        tape.extend( list(self.white*10)) #10 is margin to avoid index out range.
 
         threads = [(self.init_state, 1, tape)] # (current state, heah position, tape data)
         
         while threads:
             c_ste, i, tape_t = threads.pop() #tape_t: tape at thread t. Each thread have a tape
             
-            transactions = self.mt_graph[(c_ste, tape_t[i])]  #Transactions we have to state c_ste receiving word_i
+            transactions = self.mt_graph[(c_ste, self.get(tape_t, i, self.white))]  #Transactions we have to state c_ste receiving word_i
             
             if c_ste in self.final_states and len(transactions) == 0: #if current state is a final state and new transactions to this thread doesn't exists
                 return "S" #is accepted
 
-            self.delta(i, transactions, tape_t, threads)
+            self.delta(i, transactions, tape_t, threads) #threads is changed by reference
             
         return "N"
 
@@ -136,7 +147,3 @@ class MT(): #Turing Machine
         self.init_state = str(definition[n+6])
 
         self.final_states = str(definition[n+7]).split(" ")
-
-if __name__ == "__main__":
-    turing_machine = MT()
-    turing_machine.auto_run()
